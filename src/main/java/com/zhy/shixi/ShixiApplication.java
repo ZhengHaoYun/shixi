@@ -8,9 +8,10 @@ import org.springframework.cache.annotation.EnableCaching;
 @SpringBootApplication
 @EnableCaching
 public class ShixiApplication {
-    static {
-        PortUtil.checkPort(6379, "Redis 服务端", true);
-    }
+    //检查redis服务器是否启动
+//    static {
+//        PortUtil.checkPort(6379, "Redis 服务端", true);
+//    }
 
     public static void main(String[] args) {
 
