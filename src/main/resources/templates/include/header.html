@@ -1,0 +1,31 @@
+<template th:fragment="html">
+    <div id="header">
+        <div class="wrapper">
+
+            <ul class="reset" id="navheader">
+                <li><a href="/index">实习招聘网</a></li>
+                <li ><a href="/index">首页</a></li>
+                <li><a href="/companyList" >公司列表</a></li>
+                <li><a href="/positionList">全部实习</a></li>
+                <li><a href="/resume" rel="nofollow">我的简历</a></li>
+                <li><a href="/favorList" rel="nofollow">我的收藏</a></li>
+                <li><a href="/admin/listCompany" rel="nofollow">后台管理</a></li>
+            </ul>
+            <ul class="loginTop" th:if="${session.user == null}">
+                <li><a href="/userLogin" rel="nofollow">登录</a></li>
+                <li>|</li>
+                <li><a href="/userRegister" rel="nofollow">注册</a></li>
+            </ul>
+            <dl class="collapsible_menu" th:if="${session.user != null}">
+                <dt>
+                    <span th:text="${session.user.name}"></span>
+                    <span class="red dn" id="noticeDot-0"></span>
+                    <i></i>
+                </dt>
+                <dd><a rel="nofollow" href="/resume">我的简历</a></dd>
+                <dd><a href="/favorList">我收藏的职位</a></dd>
+                <dd class="logout"><a rel="nofollow" href="/logout">退出</a></dd>
+            </dl>
+        </div>
+    </div>
+</template>

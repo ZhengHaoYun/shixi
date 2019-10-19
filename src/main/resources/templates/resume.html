@@ -1,0 +1,205 @@
+﻿<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/head::html('我的简历')"></head>
+<body>
+<div id="body">
+    <input type="hidden" th:value="${session.user.userId}" id="userId">
+    <div th:include="include/header::html"></div>
+    <div id="container">
+
+        <div class="clearfix">
+            <div class="content_l">
+                <div class="fl" id="resume_name">
+                    <div class="nameShow fl">
+                        <h1>{{user.name}}</h1>的信息
+                    </div>
+                </div>
+
+                <div class="profile_box" id="basicInfo">
+                    <h2>基本信息</h2>
+                    <span class="c_edit" @click="toggleInfoAndEdit"></span>
+                    <div class="basicShow" id="basicShow">
+                        真实姓名：<span>{{user.name}}</span>
+                        <br><br>
+                        学校：<span>{{user.school}}</span>
+                        <br><br>
+                        专业：<span>{{user.major}}</span>
+                        <br><br>
+                        毕业年份：<span>{{user.graYear}}</span>
+                        <br><br>
+                        手机号：<span>{{user.mobile}}</span>
+                        <br><br>
+                    </div><!--end .basicShow-->
+
+                    <div class="basicEdit dn" id="basicEdit">
+                        <form id="profileForm">
+                            <table>
+                                <tbody>
+                                <tr>
+                                    <td valign="top">
+                                    </td>
+                                    <td>
+                                        真实姓名：<input type="text" v-model="user.name">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="top">
+                                    </td>
+                                    <td>
+                                        毕业学校：<input type="text" v-model="user.school">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="top">
+                                    </td>
+                                    <td>
+                                        专业：<input type="text" v-model="user.major">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="top">
+                                    </td>
+                                    <td>
+                                        毕业年份：<input type="text" v-model="user.graYear">
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td valign="top">
+                                    </td>
+                                    <td>
+                                        手机号：<input type="text" v-model="user.mobile">
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td></td>
+                                    <td colspan="3">
+                                        <input type="button" value="保 存" class="btn_profile_save" @click="update">
+                                        <a class="btn_profile_cancel" href="javascript:;" @click="toggleInfoAndEdit">取
+                                            消</a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </form><!--end #profileForm-->
+                    </div><!--end .basicEdit-->
+                </div><!--end #basicInfo-->
+
+            </div><!--end .content_l-->
+            <div class="content_r">
+                <div class="mycenterR" id="myInfo">
+                    <h2>我的信息</h2>
+                    <a target="_blank" href="/favorList">我收藏的职位</a>
+                    <br>
+                </div><!--end #myInfo-->
+
+                <div class="mycenterR" id="myResume">
+                    <h2>我的附件简历
+
+                    </h2>
+                    <div class="resumeUploadDiv" v-for="resume in resumes">
+                        <a :href="'static/resume/'+resume.resumeName">{{resume.resumeName}}</a>
+                        &nbsp;&nbsp;<a @click="deleteResume(resume.resumeId)">删除</a>
+                    </div>
+                </div><!--end #myResume-->
+
+                <div class="mycenterR" id="upload">
+                    <h2>上传简历</h2>
+                    <form>
+                        <input type="file"
+                               @change="getResume($event)" name="resume" id="resumeUpload">
+                        <br><br>
+                        <input type="button" value="提  交" @click="upload">
+                    </form>
+                </div>
+            </div><!--end .content_r-->
+
+        </div>
+    </div>
+    <div class="clear"></div>
+    <input type="hidden" value="97fd449bcb294153a671f8fe6f4ba655" id="resubmitToken">
+    <a rel="nofollow" title="回到顶部" id="backtop" style="display: none;"></a>
+</div><!-- end #container -->
+</div><!-- end #body -->
+<div th:include="include/footer::html"></div>
+
+<script src="style/js/core.min.js" type="text/javascript"></script>
+<script src="style/js/popup.min.js" type="text/javascript"></script>
+<script src="style/js/Chart.min.js" type="text/javascript"></script>
+<script src="style/js/profile.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function () {
+        var userId = $("#userId").val();
+        var data4Vue = {
+            user: {},
+            uri: 'user',
+            resume: '',
+            resumes: []
+        };
+
+        var vue = new Vue({
+            el: '#container',
+            data: data4Vue,
+            mounted: function () {
+                this.getUser();
+                this.listResumes();
+            },
+            methods: {
+                getUser: function () {
+                    var url = this.uri + "/" + userId;
+                    axios.get(url).then(function (response) {
+                        vue.user = response.data.data;
+                    });
+                },
+                toggleInfoAndEdit: function () {
+                    $("#basicShow").toggle()
+                    $("#basicEdit").toggle();
+
+                },
+                update: function () {
+                    var url = this.uri;
+                    axios.put(url, this.user).then(function () {
+                        vue.getUser();
+                        vue.toggleInfoAndEdit();
+                    })
+                },
+                getResume: function (event) {
+                    this.resume = event.target.files[0];
+                },
+                upload: function () {
+                    if (!checkEmpty(this.resume, "请先上传文件再提交！"))
+                        return;
+                    var url = "resumes/" + userId;
+                    var formData = new FormData();
+                    formData.append("file", this.resume);
+                    axios.post(url, formData).then(function (response) {
+                        if(response.data.code == 1){
+                            alert(response.data.message);
+                        }
+                        vue.listResumes();
+                        $("#resumeUpload").val('');
+                        vue.resume = null;
+                    });
+                },
+                listResumes: function () {
+                    var url = "resumes/" + userId;
+                    axios.get(url).then(function (response) {
+                        vue.resumes = response.data.data;
+                    });
+                },
+                deleteResume: function (resumeId) {
+                    if (!checkDeleteLink())
+                        return;
+                    var url = "resumes/" + resumeId;
+                    axios.delete(url).then(function (response) {
+                        vue.listResumes();
+                    })
+                }
+            }
+        })
+    })
+</script>
+
+</body>
+</html>

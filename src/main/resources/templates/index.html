@@ -1,0 +1,144 @@
+﻿<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/head::html('首页')"></head>
+
+<body>
+<div id="body">
+    <div th:include="include/header::html"></div>
+    <div id="container">
+
+        <div id="sidebar">
+            <div id="options" class="greybg">
+                <dl>
+                    <dt>实习分类 <em></em></dt>
+                    <dd>
+                        <div v-for="category in categories" @click="listByCategory(category.categoryId)">
+                            {{category.categoryName}}
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        <div class="content">
+
+            <div th:include="include/banner::html"></div>
+
+
+            <ul class="reset hotabbing">
+                <li class="current">实习列表</li>
+            </ul>
+            <div id="hotList">
+                <ul class="hot_pos reset">
+                    <li class="clearfix" v-for="(pos,index) in positions" v-if="index < 5">
+                        <div class="hot_pos_l">
+                            <div class="mb10">
+                                <a :href="'position?id='+pos.positionId" target="_blank">{{pos.title}}</a>
+                                &nbsp;
+                                <span class="c9">[{{pos.workCity}}]</span>
+                            </div>
+                            <span><em class="c7">月薪： </em>{{pos.salaryDown}}-{{pos.salaryUp}}</span>
+                            <span><em class="c7">招聘人数：</em> {{pos.quantity}}</span>
+                            <br/>
+                            <span><em class="c7">工作要求：</em>{{pos.requirement}}</span>
+                            <br/>
+                        </div>
+                        <div class="hot_pos_r">
+                            <div class="mb10 recompany"><a
+                                    target="_blank">{{pos.company.companyName}}</a>
+                            </div>
+                            <span><em class="c7">公司所在城市：</em> {{pos.company.city}}</span>
+                            <br/>
+                            <span><em class="c7">联系电话：</em> {{pos.company.phone}}</span>
+                            <ul class="companyTags reset">
+                                <li>移动互联网</li>
+                                <li>五险一金</li>
+                                <li>扁平管理</li>
+                            </ul>
+                        </div>
+                    </li>
+                    <a th:href="@{/positionList}" class="btn fr" target="_blank">查看更多</a>
+                </ul>
+            </div>
+
+            <div class="clear"></div>
+        </div>
+
+
+        <script type="text/javascript" src="style/js/Chart.min.js"></script>
+        <script type="text/javascript" src="style/js/home.min.js" id="home_min"></script>
+        <script type="text/javascript" src="style/js/count.js"></script>
+        <div class="clear"></div>
+        <input type="hidden" id="resubmitToken" value=""/>
+        <a id="backtop" title="回到顶部" rel="nofollow"></a>
+
+    </div><!-- end #container -->
+</div><!-- end #body -->
+<div th:include="include/footer::html"></div>
+
+<script type="text/javascript" src="style/js/core.min.js"></script>
+<script type="text/javascript" src="style/js/popup.min.js"></script>
+
+<script>
+    $(function () {
+        var data4Vue = {
+            categories: [],
+            category: {},
+            departments: [],
+            positions: [],
+            company: {companyId: '', city: '', companyName: '', phone: '', description: ''}
+        };
+        var sidebarVue = new Vue({
+            el: '#sidebar',
+            data: data4Vue,
+            mounted: function () { //mounted　表示这个 Vue 对象加载成功了
+                this.listDepartments();
+                this.listCategories();
+            },
+            methods: {
+                listDepartments: function () {
+                    var url = "departments";
+                    axios.get(url).then(function (response) {
+                        sidebarVue.departments = response.data.data;
+                    });
+                },
+                listCategories: function () {
+                    var url = "categories";
+                    axios.get(url).then(function (response) {
+                        sidebarVue.categories = response.data.data;
+                    });
+                },
+                listByCategory:function(cid){
+                    var url = "positionList?cid=" + cid;
+                    location.href="/"+url;
+                }
+            }
+        });
+
+        var hostListVue = new Vue({
+            el: '#hotList',
+            data: data4Vue,
+            mounted: function () { //mounted　表示这个 Vue 对象加载成功了
+                this.listPositions();
+            },
+            methods: {
+                listPositions: function () {
+                    var url = "positions";
+                    axios.get(url).then(function (response) {
+                        hostListVue.positions = response.data.data;
+                        console.log(hostListVue.positions);
+                    });
+                },
+                getCompanyById: function (companyId) {
+                    var url = "companies/" + companyId;
+                    axios.get(url).then(function (response) {
+                        hostListVue.company = response.data.data;
+                    });
+                }
+            }
+
+        });
+    })
+</script>
+
+</body>
+</html>	

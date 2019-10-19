@@ -1,0 +1,84 @@
+﻿<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/head::html('公司列表')"></head>
+<body>
+<div id="body">
+    <div th:include="include/header::html"></div>
+    <div id="container">
+
+        <div class="clearfix">
+            <div class="content_l">
+                <form id="companyListForm" name="companyListForm" method="get" action="h/c/companylist.html">
+
+                    <ul class="hc_list reset">
+                        <li v-for="company in beans">
+                            <a target="_blank">
+                                <h3>{{company.companyName}}</h3>
+                            </a>
+                            <a target="_blank"> 公司简介：{{company.description}}</a>
+                            <a target="_blank"> 联系电话：{{company.phone}}</a>
+                            <a target="_blank"> 城市：{{company.city}}</a>
+                            <ul class="reset ctags">
+                                <li>D轮及以上</li>
+                                <li>安全</li>
+                                <li>年终分红</li>
+                                <li>绩效奖金</li>
+                                <li>五险一金</li>
+                                <li>交通补助</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                </form>
+            </div>
+            <div class="content_r">
+                <a target="_blank" class="eventAd">
+                    <img src="style/images/subject280.jpg" width="280" height="135"/>
+                </a>
+                <a target="_blank" class="eventAd">
+                    <img src="style/images/rising280.png" width="280" height="135"/>
+                </a>
+            </div>
+        </div>
+
+
+        <div class="clear"></div>
+        <input type="hidden" id="resubmitToken" value=""/>
+        <a id="backtop" title="回到顶部" rel="nofollow"></a>
+    </div><!-- end #container -->
+</div><!-- end #body -->
+<div th:include="include/footer::html"></div>
+
+<script type="text/javascript" src="style/js/core.min.js"></script>
+<script type="text/javascript" src="style/js/popup.min.js"></script>
+<script type="text/javascript" src="style/js/company_list.min.js"></script>
+<script>
+    $(function () {
+        var data4Vue = {
+            uri: 'companies',
+            beans: [],
+            bean: {id: 0, companyName: '', description: '', city: '', phone: ''},
+        };
+
+        //ViewModel
+        var vue = new Vue({
+            el: '#container',
+            data: data4Vue,
+            mounted: function () {
+                this.list();
+            },
+            methods: {
+                list: function () {
+                    var url = this.uri;
+                    axios.get(url).then(function (response) {
+                        vue.beans = response.data.data;
+                    });
+                }
+
+            }
+        });
+    })
+</script>
+
+</body>
+</html>

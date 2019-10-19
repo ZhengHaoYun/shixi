@@ -1,0 +1,83 @@
+﻿<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/head::html('首页')"></head>
+
+<body>
+<div id="body">
+    <div th:include="include/header::html"></div>
+    <div id="container">
+
+        <div class="clearfix">
+            <div class="content_l">
+                <dl class="c_collections">
+                    <dt>
+                        <h1><em></em>我收藏的职位</h1>
+                    </dt>
+                    <dd>
+                        <form id="collectionsForm">
+                            <ul class="reset my_collections">
+                                <li data-id="133340" v-for="favor in favors">
+                                    <div class="co_item">
+                                        <h2>
+                                            <a target="_blank" :href="'position?id='+favor.position.positionId">
+                                                <em>{{favor.position.title}}</em>
+                                                <span>({{favor.position.salaryDown}}-{{favor.position.salaryUp}})</span>
+                                            </a>
+                                        </h2>
+                                        <div class="co_cate">{{favor.position.company.companyName}} /
+                                            {{favor.position.workCity}} / {{favor.position.quantity}}人 / 本科
+                                        </div>
+                                        <i></i>
+                                    </div>
+                                </li>
+                            </ul>
+                        </form>
+                    </dd>
+                </dl>
+            </div>
+            <div class="content_r">
+                <div class="mycenterR" id="myInfo">
+                    <h2>我的信息</h2>
+                    <a href="/favorList">我收藏的职位</a>
+                    <br>
+                </div><!--end #myInfo-->
+            </div>
+        </div>
+        <div class="clear"></div>
+        <input type="hidden" value="4c6ae41d8c254f91becdb5f9ef2d4394" id="resubmitToken">
+        <a rel="nofollow" title="回到顶部" id="backtop"></a>
+    </div><!-- end #container -->
+</div><!-- end #body -->
+<div th:include="include/footer::html"></div>
+
+<script src="style/js/collections.min.js"></script>
+<script src="style/js/core.min.js" type="text/javascript"></script>
+<script src="style/js/popup.min.js" type="text/javascript"></script>
+<script>
+    $(function () {
+        var data4Vue = {
+            uri:'favors',
+            favors:[]
+        };
+
+        var vue = new Vue({
+            el:'#container',
+            data:data4Vue,
+            mounted:function(){
+                this.getFavorsByUser();
+            },
+            methods:{
+                getFavorsByUser:function(){
+                    var url = this.uri;
+                    axios.get(url).then(function(response){
+                        vue.favors = response.data.data;
+                        console.log(response);
+                        console.log(vue.favors);
+                    })
+                }
+            }
+        });
+    })
+</script>
+</body>
+</html>

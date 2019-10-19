@@ -1,0 +1,70 @@
+﻿<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/head::html('登录')"></head>
+
+<body id="login_bg">
+<div class="login_wrapper" id="userLogin">
+
+
+    <input type="hidden" id="resubmitToken" value=""/>
+    <div class="login_box">
+        <h1>登陆</h1>
+        <form id="loginForm" action="index.html">
+            <input type="text" id="email" v-model="user.email" name="email" value="" tabindex="1"
+                   placeholder="请输入登录邮箱地址"/>
+            <input type="password" id="password" v-model="user.password" name="password" tabindex="2"
+                   placeholder="请输入密码"/>
+            <span class="error"  id="beError"></span>
+
+            <!--<input type="submit" id="submitLogin" value="登 &nbsp; &nbsp; 录" />-->
+            <a style="color:#fff;" @click="login" class="submitLogin" title="登 &nbsp; &nbsp; 录"/>登 &nbsp; &nbsp;
+            录</a>
+
+        </form>
+        <div class="login_right">
+            <div>还没有帐号？</div>
+            <a href="/userRegister" class="registor_now">立即注册</a>
+        </div>
+    </div>
+    <div class="login_header">
+        <div id="cloud_s"><img src="style/images/cloud_s.png" width="81" height="52" alt="cloud"/></div>
+        <div id="cloud_m"><img src="style/images/cloud_m.png" width="136" height="95" alt="cloud"/></div>
+    </div>
+    <div class="login_box_btm"></div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        var data4Vue = {
+            uri: 'user/login',
+            user: {email: '', password: ''}
+        };
+        var vue = new Vue({
+            el: '#userLogin',
+            data: data4Vue,
+            methods: {
+                login: function () {
+                    var url = this.uri;
+                    if (0 == this.user.email.length) {
+                        $("#beError").html("请输入邮箱地址");
+                        return;
+                    }
+                    if (0 == this.user.password.length) {
+                        $("#beError").html("请输入密码");
+                        return;
+                    }
+                    axios.post(url, this.user).then(function (response) {
+                        var result = response.data;
+                        if (result.code == 0) {
+                            location.href = "index";
+                        } else {
+                            $("#beError").html(result.message);
+                        }
+                    });
+                }
+            }
+        });
+    })
+</script>
+</body>
+</html>

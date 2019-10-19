@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>公司列表</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.4.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/vue/2.6.10/vue.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/axios/0.17.1/dist/axios.js}"></script>
+</head>
+<style>
+    li {
+        float: left;
+        list-style: none;
+    }
+</style>
+<body>
+<div id="company">
+    <h1>公司列表</h1>
+    <br>
+    <div>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>公司名称</th>
+                <th>公司简介</th>
+                <th>所在城市</th>
+                <th>联系电话</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="bean in beans ">
+                <td>{{bean.companyId}}</td>
+                <td>
+                    {{bean.companyName}}
+                </td>
+                <td>
+                    <span>{{bean.description}}</span>
+                </td>
+                <td>
+                    {{bean.city}}
+                </td>
+                <td>
+                    {{bean.phone}}
+                </td>
+                <td>
+                    <button @click="edit(bean)">编辑</button>
+                    <button @click="deleteBean(bean.companyId)">删除</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div th:include="include/page::html"></div>
+    <br><br>
+    <div id="add" style="float:left;">
+        <div><h3>新增分类</h3></div>
+        <div>
+            <table>
+                <tr>
+                    <td>公司名称</td>
+                    <td><input @keyup.enter="add" v-model.trim="bean.companyName" type="text"></td>
+                </tr>
+                <tr>
+                    <td>公司简介</td>
+                    <td>
+                        <input type="text" v-model="bean.description" @keyup.enter="add"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>公司所在城市</td>
+                    <td>
+                        <input type="text" v-model="bean.city" @keyup.enter="add"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>联系电话</td>
+                    <td>
+                        <input type="text" v-model="bean.phone" @keyup.enter="add"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button @click="add">提交</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div id="edit" style="display: none">
+        <div><h3>编辑</h3></div>
+        <div>
+            <table>
+                <tr>
+                    <td>公司名称</td>
+                    <td><input @keyup.enter="update" v-model.trim="bean.companyName" type="text"></td>
+                </tr>
+                <tr>
+                    <td>公司简介</td>
+                    <td>
+                        <input type="text" v-model="bean.description" @keyup.enter="add"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>公司所在城市</td>
+                    <td>
+                        <input type="text" v-model="bean.city" @keyup.enter="add"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>联系电话</td>
+                    <td>
+                        <input type="text" v-model="bean.phone" @keyup.enter="add"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button @click="update">提交</button>
+                        <button @click="cancel">取消</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    $(function () {
+
+        var data4Vue = {
+            uri: '/companiesByPage',
+            beans: [],
+            bean: {id: 0, companyName: '', description: '', city: '', phone: ''},
+            pagination: {},
+        };
+
+        //ViewModel
+        var vue = new Vue({
+            el: '#company',
+            data: data4Vue,
+            mounted: function () {
+                this.list(0);
+            },
+            methods: {
+                list: function (start) {
+                    var url = this.uri + "?start=" + start;
+                    axios.get(url).then(function (response) {
+                        vue.beans = response.data.data.content;
+                        vue.pagination = response.data.data;
+                    });
+                },
+                add: function () {
+                    if (!checkEmpty(this.bean.companyName, "分类名称"))
+                        return;
+                    if (!checkEmpty(this.bean.description, "公司简介"))
+                        return;
+                    if (!checkEmpty(this.bean.city, "公司所在地"))
+                        return;
+                    if (!checkEmpty(this.bean.phone, "联系电话"))
+                        return;
+                    var url = "/companies";
+                    axios.post(url, vue.bean).then(function (response) {
+                        vue.list(0);
+                        vue.bean = {id: 0, companyName: '', description: '', city: '', phone: ''};
+                    });
+                },
+                edit: function (bean) {
+                    $("#add").hide();
+                    $("#edit").show();
+                    this.bean = bean;
+                },
+                update: function () {
+                    if (!checkEmpty(this.bean.companyName, "分类名称"))
+                        return;
+                    if (!checkEmpty(this.bean.description, "公司简介"))
+                        return;
+                    if (!checkEmpty(this.bean.city, "公司所在地"))
+                        return;
+                    if (!checkEmpty(this.bean.phone, "联系电话"))
+                        return;
+                    var url = "/companies";
+                    axios.put(url, this.bean).then(function (response) {
+                        vue.list(0);
+                        vue.bean = {id: 0, companyName: '', description: '', city: '', phone: ''};
+                        $("#add").show();
+                        $("#edit").hide();
+                    })
+                },
+                deleteBean: function (id) {
+                    // if (!checkDeleteLink()) {
+                    //     return;
+                    // }
+                    var url = "/companies/" + id;
+                    axios.delete(url).then(function (response) {
+                        vue.list(0);
+                    })
+                },
+                cancel: function () {
+                    $("#add").show();
+                    $("#edit").hide();
+                    vue.bean = {id: 0, companyName: '', description: '', city: '', phone: ''};
+                },
+
+
+                jump: function (page) {
+                    jump(page, vue);
+                },
+                jumpByNumber: function (start) {
+                    jumpByNumber(start, vue);
+                }
+            }
+        });
+    });
+
+    //跳转函数
+    function jump(page, vue) {
+        if ('first' == page && !vue.pagination.first)
+            vue.list(0);
+
+        else if ('pre' == page && vue.pagination.hasPrevious)
+            vue.list(vue.pagination.number - 1);
+
+        else if ('next' == page && vue.pagination.hasNext)
+            vue.list(vue.pagination.number + 1);
+
+        else if ('last' == page && !vue.pagination.last)
+            vue.list(vue.pagination.totalPages - 1);
+    }
+
+    //跳转函数
+    function jumpByNumber(start, vue) {
+        if (start != vue.pagination.number)
+            vue.list(start);
+    }
+
+    //判断是否为空
+    function checkEmpty(value, text) {
+
+        if (null == value || value.length == 0) {
+            alert(text + "不能为空");
+            return false;
+        }
+        return true;
+    }
+
+    //获取地址栏参数的函数
+    function getUrlParms(para) {
+        var search = location.search; //页面URL的查询部分字符串
+        var arrPara = new Array(); //参数数组。数组单项为包含参数名和参数值的字符串，如“para=value”
+        var arrVal = new Array(); //参数值数组。用于存储查找到的参数值
+
+        if (search != "") {
+            var index = 0;
+            search = search.substr(1); //去除开头的“?”
+            arrPara = search.split("&");
+
+            for (i in arrPara) {
+                var paraPre = para + "="; //参数前缀。即参数名+“=”，如“para=”
+                if (arrPara[i].indexOf(paraPre) == 0 && paraPre.length < arrPara[i].length) {
+                    arrVal[index] = decodeURI(arrPara[i].substr(paraPre.length)); //顺带URI解码避免出现乱码
+                    index++;
+                }
+            }
+        }
+
+        if (arrVal.length == 1) {
+            return arrVal[0];
+        } else if (arrVal.length == 0) {
+            return null;
+        } else {
+            return arrVal;
+        }
+    }
+
+    //确实是否要删除
+    function checkDeleteLink() {
+        var confirmDelete = confirm("确认要删除吗？");
+        if (confirmDelete)
+            return true;
+        return false;
+    }
+</script>
+</html>

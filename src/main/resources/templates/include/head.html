@@ -1,0 +1,97 @@
+<template th:fragment="html(title)">
+    <script id="allmobilize" charset="utf-8" src="style/js/allmobilize.min.js"></script>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="alternate" media="handheld"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>实习</title>
+    <meta property="qc:admins" content="23635710066417756375"/>
+    <meta name="baidu-site-verification" content="QIQ6KC1oZ6"/>
+    <script type="text/javascript">
+        var ctx = "h";
+    </script>
+    <link rel="Shortcut Icon" href="h/images/hr.ico">
+    <link rel="stylesheet" type="text/css" href="style/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="style/css/external.min.css"/>
+    <link rel="stylesheet" type="text/css" href="style/css/popup.css"/>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.4.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/vue/2.6.10/vue.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/axios/0.17.1/dist/axios.js}"></script>
+    <script type="text/javascript" src="style/js/jquery.lib.min.js"></script>
+    <script src="style/js/ajaxfileupload.js" type="text/javascript"></script>
+    <script type="text/javascript" src="style/js/additional-methods.js"></script>
+    <script type="text/javascript" src="style/js/excanvas.js"></script>
+    <script type="text/javascript">
+        var youdao_conv_id = 271546;
+    </script>
+    <script type="text/javascript" src="style/js/conv.js"></script>
+
+    <script>
+        //判断是否为空
+        function checkEmpty(value, text) {
+
+            if (null == value || value.length == 0) {
+                alert(text + "不能为空");
+                return false;
+            }
+            return true;
+        }
+
+        //获取地址栏参数的函数
+        function getUrlParms(para) {
+            var search = location.search; //页面URL的查询部分字符串
+            var arrPara = new Array(); //参数数组。数组单项为包含参数名和参数值的字符串，如“para=value”
+            var arrVal = new Array(); //参数值数组。用于存储查找到的参数值
+
+            if (search != "") {
+                var index = 0;
+                search = search.substr(1); //去除开头的“?”
+                arrPara = search.split("&");
+
+                for (i in arrPara) {
+                    var paraPre = para + "="; //参数前缀。即参数名+“=”，如“para=”
+                    if (arrPara[i].indexOf(paraPre) == 0 && paraPre.length < arrPara[i].length) {
+                        arrVal[index] = decodeURI(arrPara[i].substr(paraPre.length)); //顺带URI解码避免出现乱码
+                        index++;
+                    }
+                }
+            }
+
+            if (arrVal.length == 1) {
+                return arrVal[0];
+            } else if (arrVal.length == 0) {
+                return null;
+            } else {
+                return arrVal;
+            }
+        }
+
+        //确实是否要删除
+        function checkDeleteLink() {
+            var confirmDelete = confirm("确认要删除吗？");
+            if (confirmDelete)
+                return true;
+            return false;
+        }
+
+        //跳转函数
+        function jump(page, vue) {
+            if ('first' == page && !vue.pagination.first)
+                vue.list(0);
+
+            else if ('pre' == page && vue.pagination.hasPrevious)
+                vue.list(vue.pagination.number - 1);
+
+            else if ('next' == page && vue.pagination.hasNext)
+                vue.list(vue.pagination.number + 1);
+
+            else if ('last' == page && !vue.pagination.last)
+                vue.list(vue.pagination.totalPages - 1);
+        }
+
+        //跳转函数
+        function jumpByNumber(start, vue) {
+            if (start != vue.pagination.number)
+                vue.list(start);
+        }
+    </script>
+</template>

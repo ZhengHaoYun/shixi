@@ -1,0 +1,72 @@
+﻿<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/head::html('注册')"></head>
+
+<body id="login_bg">
+<div class="login_wrapper" id="userRegister">
+
+    <input type="hidden" id="resubmitToken" value="9b207beb1e014a93bc852b7ba450db27"/>
+    <div class="login_box">
+        <h1>注册</h1>
+        <form id="loginForm">
+            <input type="text" id="email" v-model="user.email" name="email" tabindex="1" placeholder="请输入常用邮箱地址"/>
+            <input type="password" id="password" v-model="user.password" name="password" tabindex="2"
+            placeholder="请输入密码"/>
+            <span class="error" id="beError"></span>
+            <input type="button" @click="register" id="submitLogin" value="注册"/>
+
+        </form>
+        <div class="login_right">
+            <div>已有拉勾帐号</div>
+            <a href="/userLogin" class="registor_now">直接登录</a>
+        </div>
+    </div>
+    <div class="login_header">
+        <div id="cloud_s"><img src="style/images/cloud_s.png" width="81" height="52" alt="cloud"/></div>
+        <div id="cloud_m"><img src="style/images/cloud_m.png" width="136" height="95" alt="cloud"/></div>
+    </div>
+    <div class="login_box_btm"></div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function (e) {
+
+        var data4Vue = {
+            uri: 'user/register',
+            user: {email: '', password: ''}
+        }
+
+        var vue = new Vue({
+            el: '#userRegister',
+            data: data4Vue,
+            mounted: function () {
+
+            },
+            methods: {
+                register: function () {
+                    if (0 == this.user.email.length) {
+                        $("#beError").html("请输入邮箱地址");
+                        return;
+                    }
+                    if (0 == this.user.password.length) {
+                        $("#beError").html("请输入密码");
+                        return;
+                    }
+                    var url = this.uri;
+                    axios.post(url, this.user).then(function (value) {
+                        var result = value.data;
+                        if (result.code == 0) {
+                            alert("注册成功，请登录！");
+                            location.href = "userLogin";
+                        } else {
+                            $("#beError").html(result.message);
+                        }
+                    })
+                }
+            }
+        })
+    });
+</script>
+</body>
+</html>
